@@ -1,28 +1,40 @@
-import { 
+import {
   Action,
   Reducer,
   createStore,
-  Store 
+  Store
 } from 'redux';
 
 interface PlusAction extends Action{
   payload: number;
 }
 
-let reducer: Reducer<number> = (state: number = 0, action: Action) =>{
+
+
+/* declaro una funcion pura o reducer, que recibe solo dos param el estado anterior y la accion a realizar en el estado*/
+let reducer: Reducer<any> = (state = { numero: 1 }, action: Action) =>{
   if(action === null) return state;
   switch(action.type){
     case 'INCREMENT':
-      return state + 1;
+      return Object.assign({}, state, {
+            numero: state.numero + 1
+          }) ;
     case 'DECREMENT':
-      return state - 1;
+      return Object.assign({}, state, {
+            numero: state.numero - 1
+          }) ;
     case 'PLUS':
-      return state + (<PlusAction>action).payload;
+      return Object.assign({}, state, {
+            numero: state.numero + (<PlusAction>action).payload
+          }) ;
+
     default:
       return state;
   }
 }
 
+
+/* se crean los actions que van a modificar data en el store*/
 var incrementAction: Action = {
   type: 'INCREMENT'
 }
@@ -36,13 +48,15 @@ var plusAction: PlusAction = {
   payload: 5
 }
 
-let store: Store<number> = createStore<number>(reducer);
+/* se crea el store y se le pasa como parámetro la fincion reducer */
+let store: Store<any> = createStore<any>(reducer);
 
 console.log('init',store.getState());//0
 store.subscribe(()=>{
-  console.log('subscribe',store.getState());
+  console.log('subscribe to store, then store value is ',store.getState());
 })
 
+/* se despachan acciones que afectan data en el store */
 store.dispatch(incrementAction);
 store.dispatch(plusAction);
 store.dispatch(decrementAction);
